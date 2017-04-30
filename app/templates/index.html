@@ -11,7 +11,10 @@
 			integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
 	    	crossorigin=""></script>
 		<script type='text/javascript' src='https://unpkg.com/leaflet.markercluster@1.0.5/dist/leaflet.markercluster.js'></script>
+		<script type="text/javascript" src="https://api.mapbox.com/mapbox.js/plugins/leaflet-geodesy/v0.1.0/leaflet-geodesy.js"></script>
+		<script type="text/javascript" src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
 
+		<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script><link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet'/>
 		<link rel="stylesheet" href="/static/main.css"/>
 
 	</head>
@@ -29,11 +32,6 @@
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 			subdomains: ['a','b','c']
 		}).addTo(my_map);
-		
-		var markerClusters = L.markerClusterGroup({
-			disableClusteringAtZoom: 17,
-			spiderfyOnMaxZoom: false,
-			chunkLoading: true});
 
 		var yellowIcon = L.icon({
 			iconUrl: '/static/yellow-dot.png',
@@ -60,18 +58,59 @@
 		});
 
 		icons = [yellowIcon, greenIcon, purpleIcon, orangeIcon];
+		
+		var markerClusters = L.markerClusterGroup({
+			disableClusteringAtZoom: 17,
+			spiderfyOnMaxZoom: false,
+			chunkLoading: true,
+			zoomToBoundsOnClick: true});
+
+		var areaClusters = L.markerClusterGroup({
+			disableClusteringAtZoom: 15,
+			spiderfyOnMaxZoom: false,
+			chunkLoading: true,
+		});
+	
+
+		// Trying to merge circles with this 
+
 		var i = 0;
 		{% for d in data %}
 			{% for (key, value) in d.iterrows() %}
+				var circle;
 				lat = {{value.LAT}}
 				long = {{value.LONG}}
 				var m = L.marker([lat, long], {icon: icons[i]});
+				if (i == 0) {
+					// Change L for LGeo - Loss of performance but better result
+					circle = L.circle([lat, long], 25, {
+					    color: 'red',
+					    fillColor: '#f03',
+					    fillOpacity: 0.25,
+					    stroke: false
+					});
+					areaClusters.addLayer(circle);
+				}
 				markerClusters.addLayer(m);
 			{% endfor %}
 			i++;
 		{% endfor %}
 		
 		my_map.addLayer(markerClusters);
+		my_map.addLayer(areaClusters);
+		
+		
+		/*
+		function unify(polyList) {
+			for (var i = 0; i < polyList.length; ++i) {
+				if (i == 0) {
+		    		var unionTemp = polyList[i].toGeoJSON();
+		    	} else {
+		    		unionTemp = turf.union(unionTemp, polyList[i].toGeoJSON());
+				}
+			}
+			return L.geoJson(unionTemp);
+		}*/
 	</script>
 
 </html>
