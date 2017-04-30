@@ -1,4 +1,6 @@
-from flask import Flask, render_template
+from app import app
+from flask import render_template
+
 import pandas as pd
 
 data = pd.read_csv('arbolado-publico-lineal.csv', delimiter=';')
@@ -18,10 +20,6 @@ polen_data_coords = polen_data[['LAT', 'LONG']]
 
 print(polen_data_coords.shape)
 # polen_data_coords = polen_data_coords[1:2000]
-
-app = Flask(__name__)
-
-
 
 @app.route('/')
 def index():
