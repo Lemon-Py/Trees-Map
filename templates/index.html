@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+	    integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
+			   crossorigin=""/>
+		<link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.5/dist/MarkerCluster.css" />
+    	<link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.5/dist/MarkerCluster.Default.css" />
+	  	
+	  	<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js" 
+			integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
+	    	crossorigin=""></script>
+		<script type='text/javascript' src='https://unpkg.com/leaflet.markercluster@1.0.5/dist/leaflet.markercluster.js'></script>
+
+		<link rel="stylesheet" href="/static/main.css"/>
+
+	</head>
+	<body>
+		<div id="full-map"></div>
+	</body>
+
+	<script>
+		var my_map = L.map('full-map', {
+			center: [-34.6037, -58.3816],
+			minZoom: 2,
+			zoom: 20
+		});
+		L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+			subdomains: ['a','b','c']
+		}).addTo(my_map);
+		
+		var markerClusters = L.markerClusterGroup();
+
+		{% for key, value in polen_data_coords.iterrows() %}
+			lat = {{value.LAT}}
+			long = {{value.LONG}}
+			var m = L.marker([lat, long])
+
+			markerClusters.addLayer(m);
+		{% endfor %}
+		my_map.addLayer(markerClusters);
+	</script>
+
+</html>
