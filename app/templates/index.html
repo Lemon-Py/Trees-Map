@@ -23,22 +23,54 @@
 		var my_map = L.map('full-map', {
 			center: [-34.6037, -58.3816],
 			minZoom: 2,
-			zoom: 20
+			zoom: 20,
 		});
 		L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 			subdomains: ['a','b','c']
 		}).addTo(my_map);
 		
-		var markerClusters = L.markerClusterGroup();
+		var markerClusters = L.markerClusterGroup({
+			disableClusteringAtZoom: 17,
+			spiderfyOnMaxZoom: false,
+			chunkLoading: true});
 
-		{% for key, value in polen_data_coords.iterrows() %}
-			lat = {{value.LAT}}
-			long = {{value.LONG}}
-			var m = L.marker([lat, long])
+		var yellowIcon = L.icon({
+			iconUrl: '/static/yellow-dot.png',
+			iconSize: [18, 18],
+			iconAnchor: [9, 9]
+		});
 
-			markerClusters.addLayer(m);
+		var greenIcon = L.icon({
+			iconUrl: '/static/green-dot.png',
+			iconSize: [18, 18],
+			iconAnchor: [9, 9]	
+		});
+
+		var purpleIcon = L.icon({
+			iconUrl: '/static/purple-dot.png',
+			iconSize: [18, 18],
+			iconAnchor: [9, 9]
+		});
+
+		var orangeIcon = L.icon({
+			iconUrl: '/static/orange-dot.png',
+			iconSize: [18, 18],
+			iconAnchor: [9, 9]
+		});
+
+		icons = [yellowIcon, greenIcon, purpleIcon, orangeIcon];
+		var i = 0;
+		{% for d in data %}
+			{% for (key, value) in d.iterrows() %}
+				lat = {{value.LAT}}
+				long = {{value.LONG}}
+				var m = L.marker([lat, long], {icon: icons[i]});
+				markerClusters.addLayer(m);
+			{% endfor %}
+			i++;
 		{% endfor %}
+		
 		my_map.addLayer(markerClusters);
 	</script>
 
